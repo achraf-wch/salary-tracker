@@ -1,0 +1,16 @@
+.navbar{
+    background-color: red;
+}
+.sidebar h3:hover{
+    text-decoration: underline;
+    background-color: #3498db;
+    padding: 6px;
+    border-radius: 10px;
+}
+.home{
+height:100%;
+width:100%;
+}
+.yellow-color{
+    background-color:#f1c40f ;
+}
