@@ -38,8 +38,6 @@ export  default function LoginFrom() {
   }
   return (
       <div className="pt-3 container">
-        <div>{client?<h2>hi {client.name}</h2>:<h2>nothing</h2>}</div>
-            <div>{client?<h2>hi {client.name}</h2>:<h2>nothing</h2>}</div>
             <div>{error}</div>
         <div className="row">
             <p className="col-12 text-center">do you have an acount ?</p>
