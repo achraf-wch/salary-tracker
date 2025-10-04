@@ -10,51 +10,84 @@ import { useEffect } from 'react';
     const[category,setCategory]=useState(null);
     const[error,setError]=useState('');
     const[items,setItems]=useState({
-      food:{id:1,amount:0},
-      health:{id:2,amount:0},
-     learning:{id:3,amount:0},
-     travel:{id:4,amount:0},
-      sport:{id:5,amount:0},
+      food:{id:1,amount:0,updateMsg:null,error:null},
+      health:{id:2,amount:0,updateMsg:null,error:null},
+     learning:{id:3,amount:0,updateMsg:null,error:null},
+     travel:{id:4,amount:0,updateMsg:null,error:null},
+      sport:{id:5,amount:0,updateMsg:null,error:null},
     })
-    const[errors,setErrors]=useState({
-      food:"",
-    });
+  const[successMsg,setSuccessMsg]=useState(null); 
+  ///////////:food update hundle
     async function handleFood(e){
          e.preventDefault();
-         if(items['food'].amount>=1) errors.food="";
-         else errors.food="make sure the amount is valid";
-         setErrors({...errors});
-          try {
-    const response = await axios.post("http://127.0.0.1:8000/api/update",{
-       amount:items['food'].amount,
-       id_client:user.id_client,
-       id_cat_goal: items['food'].id,
-    },);
-      console.log(response.data);
-          
-  }
-  catch (err) {
-     if (err.response) {
-        setError(err.response.data.message || 'failed');
-      } else {
-        setError('Network error. Try again.');
-      }
-      console.log(error);
-    }
+         /////////////food validate in react
+         if(items['food'].amount<1||items['food'].amount>progress[0].cat_custom)
+          setItems(prev => ({
+            ...prev, 
+            food: { ...prev.food, error:"make sure the amount is valid"}  
+          }))
+         
+          else{
+             setItems(prev => ({
+            ...prev, 
+            food: { ...prev.food, error:null}  
+          }))
+          }
+          ////////Send api to update food
+         try {
+                const response = await axios.post("http://127.0.0.1:8000/api/update",{
+                amount:items['food'].amount,
+                id_client:user.id_client,
+                id_cat_goal: items['food'].id,
+              },);
+            
+                setItems(prev => ({
+                      ...prev,  
+                      food: { ...prev.food, updateMsg:response.data.sucess}  
+                    }))
+                    console.log(response.data);
+                    
+            }
+         catch (err) {
+            if (err.response) {
+                setError(err.response.data.message || 'failed');
+              } else {
+                setError('Network error. Try again.');
+              }
+              setItems(prev => ({
+                    ...prev,  
+                    food: { ...prev.food, updateMsg:null}  
+                  }))
+               }
          
     }
      async function handleHealth(e){
          e.preventDefault();
-         if(items['health'].amount>=1) errors.health="";
-         else errors.health="make sure the amount is valid";
-         setErrors({...errors});
+         //////////////health validate
+         if(items['health'].amount<1||items['health'].amount>progress[1].cat_custom)
+          setItems(prev => ({
+            ...prev, 
+            health: { ...prev.health, error:"make sure the amount is valid"}  
+          }))
+         
+          else{
+             setItems(prev => ({
+            ...prev, 
+            health: { ...prev.health, error:null}  
+          }))
+          }
+          /////send api to update health
           try {
-    const response = await axios.post("http://127.0.0.1:8000/api/update",{
+       const response = await axios.post("http://127.0.0.1:8000/api/update",{
        amount:items['health'].amount,
        id_client:user.id_client,
        id_cat_goal: items['health'].id,
     },);
-      console.log(response.data);
+        setItems(prev => ({
+              ...prev,  
+          health: { ...prev.health, updateMsg:response.data.success}  
+        }))
+
           
   }
   catch (err) {
@@ -63,9 +96,52 @@ import { useEffect } from 'react';
       } else {
         setError('Network error. Try again.');
       }
-      console.log(error);
+         setItems(prev => ({
+            ...prev,  
+            health: { ...prev.health, updateMsg:null}  
+          }))
     }
+     ////////////////learning handle
+     async function handleLearning(e){
+         e.preventDefault();
+         /////////////learning validate in react
+         if(items['learning'].amount<1||items['learning'].amount>progress[2].cat_custom)
+          setItems(prev => ({
+            ...prev, 
+            learning: { ...prev.learning, error:"make sure the amount is valid"}  
+          }))
          
+          else{
+             setItems(prev => ({
+            ...prev, 
+            learning: { ...prev.learning, error:null}  
+          }))
+          }
+          ////////Send api to update learning
+         try {
+                const response = await axios.post("http://127.0.0.1:8000/api/update",{
+                amount:items['learning'].amount,
+                id_client:user.id_client,
+                id_cat_goal: items['learning'].id,
+              },);
+                setItems(prev => ({
+                      ...prev,  
+                      learning: { ...prev.learning, updateMsg:response.data.sucess}  
+                    }))
+                    
+            }
+         catch (err) {
+            if (err.response) {
+                setError(err.response.data.message || 'failed');
+              } else {
+                setError('Network error. Try again.');
+              }
+              setItems(prev => ({
+                    ...prev,  
+                    learning: { ...prev.learning, updateMsg:null}  
+                  }))
+               }
+    }    
     }
     useEffect( ()=>{
       const afetch = async()=>{
@@ -73,7 +149,6 @@ import { useEffect } from 'react';
     const response = await axios.get("http://127.0.0.1:8000/api/progress",{
        params:{id_client:user.id_client,id_progress:user.id_client,id_cat_goal:items['food'].id },
     },);
-    console.log('hi');
           setProgress(response.data);
           console.log(response.data);
   }
@@ -117,50 +192,45 @@ import { useEffect } from 'react';
                  <button className='mt-3 p-2 border rounded-pill ' >food:{progress?progress[0].cat_custom:"nothing"}</button>
                  <form onSubmit={handleFood}>
                   <input className='mt-3 p-2 border rounded-pill ' value={items["food"].value} type="number" placeholder='bought something?'
- onChange={(e) => setItems(prev => ({
-  ...prev,  // ← Keep other items
-  food: { ...prev.food, amount: e.target.value }  // ← Update only food value
-}))}/>
+                        onChange={(e) => setItems(prev => ({
+                          ...prev, 
+                          food: { ...prev.food, amount: e.target.value }  
+                        }))}/>
 
                   <button className="mt-3 p-2 border rounded-pill" type="submit">buy</button>
+                  {items['food'].error? <p className="bg-danger border rounded-pill mt-2 p-3">items['food'].error</p>:""}
+                  {items['food'].updateMsg? <p className="bg-success border rounded-pill mt-2 p-3">items['food'].updateMsg</p>:""}
                  </form>
             </div>
             <div className='col-3 m-2 p-5 border rounded-pill d-flex flex-column justify-content-center' style={{backgroundColor:'#f1c40f'}}>
               <form onSubmit={handleHealth}>
                                   <button className='mt-3 p-2 border rounded-pill'>health:{progress?progress[1].cat_custom:'nothin'}</button>
                   <input className='mt-3 p-2 border rounded-pill' type="number" placeholder='bought something?'
-                   onChange={(e) => setItems(prev => ({
-  ...prev,  // ← Keep other items
-  health: { ...prev.health, amount: e.target.value }  // ← Update only food value
-}))}/>
+                                      onChange={(e) => setItems(prev => ({
+                      ...prev,  
+                      health: { ...prev.health, amount: e.target.value }  
+                    }))}/>
                   <button className="mt-3 p-2 border rounded-pill" type="submit">buy</button>
-
+                   {items['health'].error? <p className="bg-danger border rounded-pill mt-2 p-3">items['health'].error</p>:""}
+                  {items['health'].updateMsg? <p className="bg-success border rounded-pill mt-2 p-3">items['health'].updateMsg</p>:""}
               </form>
-
             </div>
             <div className='col-3 m-2 p-5 border rounded-pill d-flex flex-column justify-content-center' style={{backgroundColor:'#f1c40f'}}>
-                  <button className='mt-3 p-2 border rounded-pill'>spport:20</button>
+                  <button className='mt-3 p-2 border rounded-pill'>learnign:{progress?progress[2].cat_custom:'nothin'}</button>
                   <input className='mt-3 p-2 border rounded-pill' type="number" placeholder='bought something?'
                    onChange={(e) => setItems(prev => ({
-  ...prev,  // ← Keep other items
-  sport: { ...prev.sport, value: e.target.value }  // ← Update only food value
-}))}/>
+                    ...prev,  
+                    learning: { ...prev.learning,amount: e.target.value }  
+                  }))}/>
                   <button className="mt-3 p-2 border rounded-pill" type="submit">buy</button>
+                  
+                   {items['learning'].error? <p className="bg-danger border rounded-pill mt-2 p-3">{items['learning'].error}</p>:""}
+                  {items['learning'].updateMsg? <p className="bg-success border rounded-pill mt-2 p-3">items['learning'].updateMsg</p>:""}
                           
             </div>
         </div>
     </div>
-    <div className="coantainer">
-        <h2>lets track</h2>
-         <p>your current amount is: salary</p>
-         <div className="conatianer">
-            <h2>food</h2>
-            <p>current amount is: </p>
-            <form action="" >
-                <input type="number" placeholder='you bought something'/>
-            </form>
-         </div>
-    </div>
+   
    </div>
   )
 }

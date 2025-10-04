@@ -9,8 +9,6 @@ export default function Session() {
     const[error,setError]=useState('');
     const[amount,setAmount]=useState("");
     const[catAmount,setCatAmount]=useState("");
-   // const[idGoal, setIdGoal]=useState(0);
-     const[idDate, setIdDate]=useState(0);
      const[idCatGoal, setIdCatGoal]=useState(0);
      const[goal,setGoal]=useState({
      save:{amount:null,error:null},
@@ -18,16 +16,17 @@ export default function Session() {
      custom:{amount:null,error:null},
      idGoal:{id:null},
      });
+     const[successMsd,setSuccessMsg]=useState(null);
     const[errors,setErrors] = useState({
             startDate:"",
             endDate:"",  
     });
     const[items,setItems]=useState({
-            food:{id:1,amount:0,error:null},
-            health:{id:2,amount:0,error:null},
-            learning:{id:3,amount:0,error:null},
-            travel:{id:4,amount:0,error:null},
-            sport:{id:5,amount:0,error:null},
+            food:{id:1,amount:null,error:null},
+            health:{id:2,amount:null,error:null},
+            learning:{id:3,amount:null,error:null},
+            travel:{id:4,amount:null,error:null},
+            sport:{id:5,amount:null,error:null},
       });
       const[dates,setDates]=useState({
         start:{date:new Date(),error:null},
@@ -46,7 +45,7 @@ export default function Session() {
               save:goal['save'].amount,
               invest:goal['invest'].amount,
               });
-              idGoal = response.data.id_goal;
+              let idGoal = response.data.id_goal;
               ///////////////send api to food
               if(items['food'].amount>=0){
                 try {
@@ -55,6 +54,7 @@ export default function Session() {
                     id_category:items['food'].id,
                     cat_custom:items['food'].amount,
                   });
+                  
                   ///////////////send api to health///////////////
                     if(items['health'].amount>=0){
                        try {
@@ -64,44 +64,37 @@ export default function Session() {
                           cat_custom:items['health'].amount,
                           
                         });
-                        setIdCatGoal(response.data.id_cat_goal);
+      
                         ///////////////////////send api to learning/////////////////
                                               
                         if(items['learning'].amount>0){
                           try {
                             const response = await axios.post("http://127.0.0.1:8000/api/cat_goal", {
+                            
                               id_client:user.id_client,
                               id_category:items['learning'].id,
                               cat_custom:items['learning'].amount,
                             });
-                            setIdCatGoal(response.data.id_cat_goal);
+                          
                             ////////////send api to date/////////////////
                             try {
                               const response = await axios.post("http://127.0.0.1:8000/api/date", {
                               start:dates['start'].date,
                               end:dates['end'].date,
                               });
-                              setIdDate(response.date);
+                              let idDate=response.date.id_date;
                               ///////////////////send api to progress/////
+                              console.log('progress time');
                               try {
+                    
                                 const response = await axios.post("http://127.0.0.1:8000/api/progressCreate", {
                                 id_client:user.id_client,
                                 id_goal:idGoal,
                                 id_date:idDate,
+                               
                                 });
-                                let idProgress=response.data.id_progress;
-                                try{
-                                  const response = await axios.post('http://127.0.0.0:8000/api/session',{
-                                    id_progress:idProgress,
-                                  })
-                                }
-                                catch(err){
-                                  if (err.response) {
-                                      setError(err.response.data.message || 'Login failed');}
-                                  else {
-                                      setError('Network error. Try again.');
-                                    }
-                                }
+                              
+                        
                               } 
                               catch (err) {
                                if (err.response) {
