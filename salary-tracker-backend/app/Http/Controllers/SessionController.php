@@ -18,9 +18,6 @@ class sessionController extends Controller
             'custom'=>$request->input('custom'),
              'save'=>$request->input('save'),
             'invest'=>$request->input('invest'),
-            
-            
-         
           ]);
           
           return response()->json($goal);

@@ -8,8 +8,6 @@ use App\Models\progress;
 use App\Models\goal;
 use Illuminate\Support\Facades\DB;
 use App\Models\cat_goal;
-
-
 class ProgressController extends Controller
 {
     function progress(Request $request){
@@ -19,34 +17,29 @@ class ProgressController extends Controller
                       ->join('goals','progress.id_goal','=','goals.id_goal')
                       ->join('cat_goals','progress.id_client','=','cat_goals.id_client')
                       ->where('progress.id_client',$id_client)
-                       
                      ->get(['progress.*','clients.*','dates.*','goals.*','cat_goals.*']);
-  
  return response()->json($progress);
-
     }
    function update(Request $request) {
 
    $id_client = $request->input('id_client');
    $id_cat_goal = $request->input('id_cat_goal');
-      $amount = $request->input('amount');
+   $amount = $request->input('amount');
  
-    $progress=progress::where('progress.id_cat_goal',$id_cat_goal)
-                    ->where('progress.id_client',$id_client)
-                    ->first();
+    $progress=progress::where('progress.id_client',$id_client)
+                    ->last();
                     if($progress){
                         $cat_goal=cat_goal::find($id_cat_goal);
-                        if($cat_goal){
+                        if($cat_goal&&$cat_goal->cat_suctom>=$amount){
                             $cat_goal->cat_custom-=$amount;
-                            
-                        }
-                        $goal=goal::find($id_client);
-                        if($goal){
+                             $goal=goal::find($id_client);
+                        if($goal&&$goal->custom>=$amount){
                             $goal->custom-=$amount;
                         }
                         $goal->save();
                         $cat_goal->save();
                         return response()->json($cat_goal);
+                        }
                        
                     }
                      

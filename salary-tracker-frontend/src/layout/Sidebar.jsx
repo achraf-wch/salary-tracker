@@ -12,8 +12,7 @@ export default function Sidebar() {
             <li className=""><h3><Link className="text-decoration-none " to="/">Home</Link></h3></li>
             <li  className=""><h3><Link className="text-decoration-none" to="/MyAccount">MyAccount</Link></h3></li>
             <li  className=""><h3>{user?<Link className="text-decoration-none" to="/MyProgress">MyProgress</Link>:<h2>login for MyProgress</h2>}</h3></li>
-            <li  className=""><h3>{user?<Link className="text-decoration-none" to="/NewSession">NewSession</Link>:<h2>login for NewSession</h2>}</h3></li>
-            <li  className=""><h3><Link className="text-decoration-none" to="/Settings">Settings</Link></h3></li>
+            <li  className=""><h3>{user?<Link className="text-decoration-none" to="/NewSession">NewSession</Link>:<h2>login for NewSession</h2>}</h3></li>           
         </ul>
     </div>
   );

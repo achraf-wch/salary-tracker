@@ -46,7 +46,6 @@ import { useEffect } from 'react';
                       food: { ...prev.food, updateMsg:response.data.sucess}  
                     }))
                     console.log(response.data);
-                    
             }
          catch (err) {
             if (err.response) {
@@ -64,12 +63,12 @@ import { useEffect } from 'react';
      async function handleHealth(e){
          e.preventDefault();
          //////////////health validate
-         if(items['health'].amount<1||items['health'].amount>progress[1].cat_custom)
+         if(items['health'].amount<1||items['health'].amount>progress[1].cat_custom){
           setItems(prev => ({
             ...prev, 
             health: { ...prev.health, error:"make sure the amount is valid"}  
-          }))
-         
+          }))}
+        
           else{
              setItems(prev => ({
             ...prev, 
@@ -101,16 +100,17 @@ import { useEffect } from 'react';
             health: { ...prev.health, updateMsg:null}  
           }))
     }
+    }
+    
      ////////////////learning handle
-     async function handleLearning(e){
+    async function handleLearning(e){
          e.preventDefault();
          /////////////learning validate in react
-         if(items['learning'].amount<1||items['learning'].amount>progress[2].cat_custom)
+         if(items['learning'].amount<1||items['learning'].amount>progress[2].cat_custom){
           setItems(prev => ({
             ...prev, 
             learning: { ...prev.learning, error:"make sure the amount is valid"}  
-          }))
-         
+          }))}
           else{
              setItems(prev => ({
             ...prev, 
@@ -128,6 +128,8 @@ import { useEffect } from 'react';
                       ...prev,  
                       learning: { ...prev.learning, updateMsg:response.data.sucess}  
                     }))
+                    console.log(response.data);
+console.log('hiiii');
                     
             }
          catch (err) {
@@ -135,6 +137,7 @@ import { useEffect } from 'react';
                 setError(err.response.data.message || 'failed');
               } else {
                 setError('Network error. Try again.');
+                console.log(err);
               }
               setItems(prev => ({
                     ...prev,  
@@ -142,7 +145,6 @@ import { useEffect } from 'react';
                   }))
                }
     }    
-    }
     useEffect( ()=>{
       const afetch = async()=>{
          try {
@@ -216,16 +218,19 @@ import { useEffect } from 'react';
               </form>
             </div>
             <div className='col-3 m-2 p-5 border rounded-pill d-flex flex-column justify-content-center' style={{backgroundColor:'#f1c40f'}}>
-                  <button className='mt-3 p-2 border rounded-pill'>learnign:{progress?progress[2].cat_custom:'nothin'}</button>
-                  <input className='mt-3 p-2 border rounded-pill' type="number" placeholder='bought something?'
-                   onChange={(e) => setItems(prev => ({
-                    ...prev,  
-                    learning: { ...prev.learning,amount: e.target.value }  
-                  }))}/>
-                  <button className="mt-3 p-2 border rounded-pill" type="submit">buy</button>
+                 <form onSubmit={handleLearning}>
+                    <button className='mt-3 p-2 border rounded-pill'>learnign:{progress?progress[2].cat_custom:'nothin'}</button>
+                    <input className='mt-3 p-2 border rounded-pill' type="number" placeholder='bought something?'
+                     onChange={(e) => setItems(prev => ({
+                      ...prev,  
+                      learning: { ...prev.learning,amount: e.target.value }  
+                    }))}/>
+                    <button className="mt-3 p-2 border rounded-pill" type="submit">buy</button>
+                    
+                    {items['learning'].error? <p className="bg-danger border rounded-pill mt-2 p-3">{items['learning'].error}</p>:""}
+                    {items['learning'].updateMsg? <p className="bg-success border rounded-pill mt-2 p-3">items['learning'].updateMsg</p>:""}
+                 </form>
                   
-                   {items['learning'].error? <p className="bg-danger border rounded-pill mt-2 p-3">{items['learning'].error}</p>:""}
-                  {items['learning'].updateMsg? <p className="bg-success border rounded-pill mt-2 p-3">items['learning'].updateMsg</p>:""}
                           
             </div>
         </div>

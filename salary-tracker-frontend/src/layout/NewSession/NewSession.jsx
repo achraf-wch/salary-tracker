@@ -7,20 +7,18 @@ export default function Session() {
     const[salary,setSalary]=useState('');
     const{user,token}=useAuth()||{};     
     const[error,setError]=useState('');
-    const[amount,setAmount]=useState("");
+    const[amount,setAmount]=useState("");////initalize with salary, so the client could follow his salary
+    /////////intialize with custom, so the client could use custom in goal to determine categories
     const[catAmount,setCatAmount]=useState("");
-     const[idCatGoal, setIdCatGoal]=useState(0);
+     ///////////the goal
      const[goal,setGoal]=useState({
      save:{amount:null,error:null},
      invest:{amount:null,error:null},
      custom:{amount:null,error:null},
      idGoal:{id:null},
      });
-     const[successMsd,setSuccessMsg]=useState(null);
-    const[errors,setErrors] = useState({
-            startDate:"",
-            endDate:"",  
-    });
+     const[successMsg,setSuccessMsg]=useState(null);/////msg of success add
+    //////////categories
     const[items,setItems]=useState({
             food:{id:1,amount:null,error:null},
             health:{id:2,amount:null,error:null},
@@ -28,16 +26,17 @@ export default function Session() {
             travel:{id:4,amount:null,error:null},
             sport:{id:5,amount:null,error:null},
       });
+      //////////dates
       const[dates,setDates]=useState({
         start:{date:new Date(),error:null},
         end:{date:new Date(),error:null},
       });
     async function handleForm(e){
         e.preventDefault();
-        validate();
+        validate();///////function to validate the data 
+  ////////send an api and only if there is no errors will pass to send the next api
   ////////send api to goal///////////////////////
-  if(user){
-          let idGoal=null;
+  if(user){//////////to make sure of the user
           try {
               const response = await axios.post("http://127.0.0.1:8000/api/goal", {
               id_client:user.id_client,
@@ -45,7 +44,7 @@ export default function Session() {
               save:goal['save'].amount,
               invest:goal['invest'].amount,
               });
-              let idGoal = response.data.id_goal;
+              let idGoal = response.data.id_goal;/////to be used in table progress
               ///////////////send api to food
               if(items['food'].amount>=0){
                 try {
@@ -62,20 +61,15 @@ export default function Session() {
                           id_client:user.id_client,
                           id_category:items['health'].id,
                           cat_custom:items['health'].amount,
-                          
                         });
-      
-                        ///////////////////////send api to learning/////////////////
-                                              
+                        ///////////////////////send api to learning/////////////////                   
                         if(items['learning'].amount>0){
                           try {
                             const response = await axios.post("http://127.0.0.1:8000/api/cat_goal", {
-                            
                               id_client:user.id_client,
                               id_category:items['learning'].id,
                               cat_custom:items['learning'].amount,
-                            });
-                          
+                            })
                             ////////////send api to date/////////////////
                             try {
                               const response = await axios.post("http://127.0.0.1:8000/api/date", {
@@ -84,17 +78,14 @@ export default function Session() {
                               });
                               let idDate=response.date.id_date;
                               ///////////////////send api to progress/////
+                              ////////progress here means a session so it has all informations
                               console.log('progress time');
                               try {
-                    
                                 const response = await axios.post("http://127.0.0.1:8000/api/progressCreate", {
                                 id_client:user.id_client,
                                 id_goal:idGoal,
                                 id_date:idDate,
-                               
                                 });
-                              
-                        
                               } 
                               catch (err) {
                                if (err.response) {
@@ -106,7 +97,7 @@ export default function Session() {
                               } 
                             catch (err) {
                               if (err.response) {
-                                  setError(err.response.data.message || 'Login failed');
+                                  setError(err.response.data.message);
                                 } else {
                                   setError('Network error. Try again.');
                                 }
@@ -115,7 +106,7 @@ export default function Session() {
                           } 
                         catch (err) {
                           if (err.response) {
-                              setError(err.response.data.message || 'Login failed');
+                              setError(err.response.data.message);
                             } else {
                               setError('Network error. Try again.');
                             }
@@ -124,7 +115,7 @@ export default function Session() {
                         } 
                       catch (err) {
                         if (err.response) {
-                            setError(err.response.data.message || 'Login failed');
+                            setError(err.response.data.message);
                           } else {
                             setError('Network error. Try again.');
                           }
@@ -136,7 +127,7 @@ export default function Session() {
                 } 
                 catch (err) {
                   if (err.response) {
-                      setError(err.response.data.message || 'Login failed');
+                      setError(err.response.data.message);
                     } else {
                       setError('Network error. Try again.');
                     }
@@ -147,7 +138,7 @@ export default function Session() {
         } 
         catch (err) {
           if (err.response) {
-              setError(err.response.data.message || 'Login failed');
+              setError(err.response.data.message);
             } else {
               setError('Network error. Try again.');
             }
@@ -156,10 +147,8 @@ export default function Session() {
       }
     function validate(){
    //////////gaol validate
-      if(salary<1) {
-        errors.salary='make sure that the salary is valid'; }
-      else { 
-        errors.salary="";
+      if(salary>1) {
+       
         setAmount(salary);
       }
       if(goal['custom'].amount<0 || goal['custom'].amount>amount) {
@@ -284,12 +273,6 @@ export default function Session() {
             end: { ...prev.end, error:"make sure the end day is vlaid"}
           }))
           }
-        ////////////////set all errors
-      setErrors({...errors})
-    for (let key in errors) {
-      if(errors[key]!==""){setError(true)}
-                   }
-      console.log(error);
     }}
   return ( 
           <div className="container pt-4">
@@ -302,13 +285,13 @@ export default function Session() {
                     <button className="mt-3 m-3 p-2 rounded-pill col-2" style={{backgroundColor:'#f1c40f'}}>{amount===''?"amount":amount}</button>
                 </div>
                 <div>
-                    <input className={!errors.salary==""?"form-control bg-danger mt-3":"form-control mt-3 rounded-pill"} type="number"  placeholder="salary" 
+                    <input className={salary<1?"form-control bg-danger mt-3":"form-control mt-3 rounded-pill"} type="number"  placeholder="salary" 
                     value = {salary} onChange={(e)=>{
                     const val = parseFloat(e.target.value)
                     setSalary(val)
                     setAmount(val);
                     }}/>
-                    <p className="text-danger">{errors.salary}</p>
+                    <p className="text-danger">{salary<1}</p>
                 </div>
                 <div>
                     <input className={goal['custom'].error?"form-control bg-danger mt-3":"form-control mt-3"} type="number" placeholder="custum" 
@@ -366,7 +349,7 @@ export default function Session() {
               </div>
                   <h3 className="mt-3 m-3 col-5">date</h3>
               <div>
-                  <input type="date" className={errors.startDate===""?"form-control col-12" :"form-control col-12 bg-danger"} placeholder='start date'
+                  <input type="date" className={!dates['start'].error?"form-control col-12" :"form-control col-12 bg-danger"} placeholder='start date'
                   value = {dates['start'].date} onChange={(e)=>{
                      setDates(prev => ({
                       ...prev,  
@@ -376,7 +359,7 @@ export default function Session() {
                   {!dates['start'].error?"":<p className='bg-danger'>{dates['start'].error}</p>}
               </div>
               <div>
-                    <input type="date" className={errors.endDate===""?"form-control mt-3" :"form-control mt-3 bg-danger" }placeholder='end date'
+                    <input type="date" className={!dates['end'].error?"form-control mt-3" :"form-control mt-3 bg-danger" }placeholder='end date'
                     value = {dates['end'].date} onChange={(e)=>{
                      setDates(prev => ({
                       ...prev,  

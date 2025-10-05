@@ -11,5 +11,4 @@ export default function Inroduction() {
        <p className="mt-4 text text-center  fs-4">how much to spend how uch to keep what ever you want</p>
      </div>
   )
-   
 }
